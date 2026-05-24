@@ -1,0 +1,71 @@
+<style>
+  /* Fixes the icon spacing and prevents text overlapping */
+  .input-icon-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .input-icon-wrapper i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 10;
+    pointer-events: none;
+    width: 16px;
+    text-align: center;
+  }
+
+  .login-input {
+    width: 100%;
+    padding: 12px 14px 12px 42px !important;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+  }
+</style>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-header">
+      <i class="fa-solid fa-truck-ramp-box"></i>
+      <h3>4J Loading Record</h3>
+      <p>Please log in to manage satellite accounts</p>
+    </div>
+    <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="loginUser">Username</label>
+        <div class="input-icon-wrapper">
+          <i class="fa-solid fa-user"></i>
+          <input
+            type="text"
+            id="loginUser"
+            class="login-input"
+            placeholder="Enter username"
+            required
+            autocomplete="off"
+          />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="loginPass">Password</label>
+        <div class="input-icon-wrapper">
+          <i class="fa-solid fa-lock"></i>
+          <input
+            type="password"
+            id="loginPass"
+            class="login-input"
+            placeholder="Enter password"
+            required
+          />
+        </div>
+      </div>
+      <button type="submit" class="btn-login">Authorized Sign In</button>
+    </form>
+  </div>
+</div>

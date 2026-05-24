@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4J Loading Record</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* Corporate Blue Palette Token System */
+      :root {
+        --color-navy: #0f172a;
+        --color-blue-main: #2563eb;
+        --color-blue-hover: #1d4ed8;
+        --color-blue-light: #eff6ff;
+        --color-blue-accent: #93c5fd;
+
+        --card-bg: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        --bg-input: #f8fafc;
+
+        /* Branded Rows Color Schemes */
+        --row-gsat: #edf7ed;
+        --row-satlite: #fff7ed;
+        --row-cignal: #fff5f5;
+      }
+
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        background-color: #ffffff;
+        color: var(--text-main);
+        margin: 0;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 100%;
+        display: none;
+      }
+
+      /* LOGIN PORTAL INJECTED LAYOUT UI STYLING */
+      .login-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--color-blue-light);
+        background-image:
+          radial-gradient(at 0% 0%, hsla(221, 100%, 93%, 1) 0, transparent 50%),
+          radial-gradient(at 50% 0%, hsla(221, 100%, 98%, 1) 0, transparent 50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .login-card {
+        background: var(--card-bg);
+        width: 100%;
+        max-width: 400px;
+        padding: 40px 32px;
+        border-radius: 16px;
+        box-shadow:
+          0 10px 25px -5px rgba(15, 23, 42, 0.08),
+          0 8px 10px -6px rgba(15, 23, 42, 0.05);
+        border: 1px solid rgba(37, 99, 235, 0.15);
+        box-sizing: border-box;
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .login-header i {
+        font-size: 2.5rem;
+        color: var(--color-blue-main);
+        margin-bottom: 12px;
+      }
+      .login-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--color-navy);
+        font-weight: 800;
+      }
+      .login-header p {
+        margin: 6px 0 0;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .login-form .form-group {
+        margin-bottom: 20px;
+      }
+      .login-form label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+        color: var(--text-muted);
+        display: block;
+      }
+      .input-icon-wrapper {
+        position: relative;
+      }
+      .input-icon-wrapper i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+      }
+
+      .login-input {
+        width: 100%;
+        padding: 12px 14px 12px 40px;
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        outline: none;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+      }
+
+      .login-input:focus {
+        background-color: #ffffff;
+        border-color: var(--color-blue-main);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+      }
+
+      .btn-login {
+        width: 100%;
+        background-color: var(--color-blue-main);
+        color: white;
+        border: none;
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-top: 10px;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+      }
+
+      .btn-login:hover {
+        background-color: var(--color-blue-hover);
+        box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+      }
+
+      /* HEADER DASHBOARD STYLES */
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+        gap: 16px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 16px;
+      }
+
+      .dashboard-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .dashboard-title-wrapper i {
+        font-size: 1.75rem;
+        color: var(--color-blue-main);
+      }
+      .header-actions-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .btn-logout {
+        background: transparent;
+        border: 1px solid #cbd5e1;
+        color: var(--text-muted);
+        padding: 11px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+      }
+
+      .btn-logout:hover {
+        background-color: #fee2e2;
+        color: #ff3737;
+        border-color: #fca5a5;
+      }
+
+      /* DASHBOARD VIEWPORT CORE STYLES */
+      .btn-primary {
+        background-color: var(--color-blue-main);
+        color: white;
+        border: none;
+        padding: 12px 22px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+        transition: all 0.2s ease;
+      }
+      .btn-primary:hover {
+        background-color: var(--color-blue-hover);
+        box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
+        transform: translateY(-1px);
+      }
+
+      .controls-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        gap: 16px;
+        flex-wrap: wrap;
+        background: var(--color-blue-light);
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+        border: 1px solid rgba(37, 99, 235, 0.15);
+      }
+      .search-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 320px;
+      }
+      .search-wrapper i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+      .search-input {
+        padding: 12px 16px 12px 40px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        outline: none;
+        background-color: var(--card-bg);
+        color: var(--text-main);
+        width: 100%;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+      }
+      .select-filter {
+        padding: 11px 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        outline: none;
+        background-color: var(--card-bg);
+        color: var(--text-main);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .search-input:focus,
+      .select-filter:focus {
+        border-color: var(--color-blue-main);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+      }
+      .controls-bar label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #475569;
+      }
+
+      .table-container {
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+        overflow-x: auto;
+        margin-bottom: 24px;
+        border: 1px solid #e2e8f0;
+        width: 100%;
+        height: 65vh;
+      }
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: left;
+      }
+      th,
+      td {
+        padding: 16px 24px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      th {
+        background-color: #f8fafc;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
+        border-bottom: 2px solid #cbd5e1;
+        white-space: nowrap;
+      }
+      th:first-child {
+        border-top-left-radius: 12px;
+      }
+      th:last-child {
+        border-top-right-radius: 12px;
+      }
+      td {
+        font-size: 0.95rem;
+        vertical-align: middle;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:last-child td:first-child {
+        border-bottom-left-radius: 12px;
+      }
+      tr:last-child td:last-child {
+        border-bottom-right-radius: 12px;
+      }
+
+      /* Table Row Background State Hooks */
+      tr.box-gsat td {
+        background-color: var(--row-gsat);
+      }
+      tr.box-satlite td {
+        background-color: var(--row-satlite);
+      }
+      tr.box-cignal td {
+        background-color: var(--row-cignal);
+      }
+      tr.box-gsat:hover td {
+        background-color: #dfedd6;
+      }
+      tr.box-satlite:hover td {
+        background-color: #f9eedb;
+      }
+      tr.box-cignal:hover td {
+        background-color: #f9ebeb;
+      }
+      tr:not(.box-gsat):not(.box-satlite):not(.box-cignal):hover td {
+        background-color: var(--color-blue-light);
+      }
+
+      td code {
+        font-family: "SFMono-Regular", Consolas, monospace;
+        background-color: rgba(255, 255, 255, 0.6);
+        padding: 4px 8px;
+        border-radius: 4px;
+        color: #334155;
+        font-size: 0.9rem;
+        border: 1px solid #cbd5e1;
+      }
+      .badge-package {
+        background-color: rgba(255, 255, 255, 0.8);
+        color: var(--color-blue-main);
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        border: 1px solid rgba(37, 99, 235, 0.25);
+        display: inline-block;
+      }
+      .box-type-text {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #475569;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 4px 8px;
+        border-radius: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+      }
+      .btn-action-group {
+        display: flex;
+        gap: 8px;
+      }
+      .btn-edit,
+      .btn-delete {
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+      }
+      .btn-edit {
+        background-color: #f1f5f9;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+      }
+      .btn-edit:hover {
+        background-color: #e2e8f0;
+        color: #0f172a;
+      }
+      .btn-delete {
+        background-color: #fff5f5;
+        color: #ff3737;
+        border: 1px solid rgba(255, 55, 55, 0.2);
+      }
+      .btn-delete:hover {
+        background-color: #ff3737;
+        color: white;
+        border-color: #ff3737;
+      }
+
+      .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .pagination-buttons {
+        display: flex;
+        gap: 6px;
+      }
+      .btn-page {
+        background-color: var(--card-bg);
+        border: 1px solid #cbd5e1;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--text-main);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.15s ease;
+      }
+      .btn-page:hover:not(:disabled) {
+        border-color: var(--color-blue-main);
+        color: var(--color-blue-main);
+        background-color: var(--color-blue-light);
+      }
+      .btn-page.active {
+        background-color: var(--color-blue-main);
+        border-color: var(--color-blue-main);
+        color: white;
+      }
+      .btn-page:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        border-color: #cbd5e1;
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* MODAL OVERLAY STYLES */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(4px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+      }
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal-card {
+        background: var(--card-bg);
+        width: 100%;
+        max-width: 650px;
+        border-radius: 16px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--color-blue-accent);
+        transform: translateY(-15px);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+      }
+      .modal-overlay.active .modal-card {
+        transform: translateY(0);
+      }
+      .modal-header {
+        padding: 20px 28px;
+        border-bottom: 2px solid var(--color-blue-main);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--color-blue-light);
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--color-navy);
+        letter-spacing: -0.01em;
+      }
+      .btn-close-modal {
+        background: white;
+        border: 1px solid var(--color-blue-accent);
+        font-size: 1rem;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        color: var(--color-blue-main);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn-close-modal:hover {
+        background-color: #ff3737;
+        color: white;
+        border-color: #ff3737;
+      }
+      .modal-body {
+        padding: 28px;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      .span-full {
+        grid-column: span 2;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+      .form-group label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+        color: var(--color-navy);
+      }
+      .form-group input,
+      .form-group select {
+        padding: 12px 14px;
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        color: var(--text-main);
+        outline: none;
+        transition: all 0.2s ease;
+      }
+      .form-group input:focus,
+      .form-group select:focus {
+        background-color: #ffffff;
+        border-color: var(--color-blue-main);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+      }
+      .modal-footer {
+        padding: 20px 28px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        background-color: var(--bg-input);
+      }
+      .btn-secondary {
+        background-color: #ffffff;
+        border: 1px solid var(--border-color);
+        color: #475569;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .btn-secondary:hover {
+        background-color: #f1f5f9;
+        color: var(--text-main);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loginContainer"></div>
+    <div id="modalContainer"></div>
+
+    <div class="container" id="dashboardContainer">
+      <div class="dashboard-header">
+        <div class="dashboard-title-wrapper">
+          <i class="fa-solid fa-truck-ramp-box"></i>
+          <h2>4J Loading Record</h2>
+        </div>
+        <div class="header-actions-group">
+          <button class="btn-primary" id="openModalBtn">
+            <i class="fa-solid fa-plus"></i> Add New Record
+          </button>
+          <button class="btn-logout" id="logoutBtn">
+            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+          </button>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <div style="display: flex; gap: 12px; flex-grow: 1; flex-wrap: wrap">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="Search database records..."
+            />
+          </div>
+
+          <select id="boxTypeFilter" class="select-filter">
+            <option value="ALL">All Box Types</option>
+            <option value="SATLITE">SATLITE</option>
+            <option value="CIGNAL">CIGNAL</option>
+            <option value="GSAT PNOY">GSAT PNOY</option>
+            <option value="GSAT HD">GSAT HD</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center">
+          <label for="rowsPerPage"
+            ><i
+              class="fa-solid fa-list-numeric"
+              style="margin-right: 6px; color: var(--text-muted)"
+            ></i
+            >Rows per page:</label
+          >
+          <select
+            id="rowsPerPage"
+            class="select-filter"
+            style="padding: 6px 12px; border-radius: 6px; margin-left: 8px"
+          >
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <i
+                  class="fa-solid fa-hashtag"
+                  style="margin-right: 6px; font-size: 0.7rem"
+                ></i
+                >ID
+              </th>
+              <th>
+                <i
+                  class="fa-solid fa-user"
+                  style="margin-right: 6px; font-size: 0.7rem"
+                ></i
+                >Owner
+              </th>
+              <th>
+                <i
+                  class="fa-solid fa-box"
+                  style="margin-right: 6px; font-size: 0.7rem"
+                ></i
+                >Box Number
+              </th>
+              <th>
+                <i
+                  class="fa-solid fa-key"
+                  style="margin-right: 6px; font-size: 0.7rem"
+                ></i
+                >PIN
+              </th>
+              <th>
+                <i
+                  class="fa-solid fa-tags"
+                  style="margin-right: 6px; font-size: 0.7rem"
+                ></i
+                >Package
+              </th>
+              <th>
+                <i
+                  class="fa-solid fa-tv"
+                  style="margin-right: 6px; font-size: 0.7rem"
+                ></i
+                >Box Type
+              </th>
+              <th>
+                <i
+                  class="fa-solid fa-calendar-days"
+                  style="margin-right: 6px; font-size: 0.7rem"
+                ></i
+                >Date
+              </th>
+              <th>
+                <i
+                  class="fa-solid fa-comment"
+                  style="margin-right: 6px; font-size: 0.7rem"
+                ></i
+                >Note
+              </th>
+              <th>
+                <i
+                  class="fa-solid fa-sliders"
+                  style="margin-right: 6px; font-size: 0.7rem"
+                ></i
+                >Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="pagination-container">
+        <div id="paginationInfo">
+          <i
+            class="fa-solid fa-chart-simple"
+            style="margin-right: 8px; color: var(--text-muted)"
+          ></i
+          >Showing 0 to 0 of 0 entries
+        </div>
+        <div class="pagination-buttons" id="paginationButtons"></div>
+      </div>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+      // CONFIGURATION: Access Credentials
+      const AUTH_USER = "admin";
+      const AUTH_PASS = "admin123";
+
+      let db = JSON.parse(localStorage.getItem("load_records")) || SEED_DATA;
+      let currentPage = 1;
+      let rowsPerPage = 25;
+      let filteredRecords = [...db];
+
+      const tableBody = document.getElementById("tableBody");
+      const searchInput = document.getElementById("searchInput");
+      const boxTypeFilter = document.getElementById("boxTypeFilter");
+      const rowsPerPageSelect = document.getElementById("rowsPerPage");
+      const paginationButtons = document.getElementById("paginationButtons");
+      const paginationInfo = document.getElementById("paginationInfo");
+
+      let formModal,
+        recordForm,
+        boxTypeDropdown,
+        packageDropdown,
+        loginScreen,
+        loginForm;
+      let currentEditRecordId = null;
+
+      const packageMatrix = {
+        "GSAT PNOY": ["120", "220", "320", "420", "520"],
+        "GSAT HD": ["120", "220", "320", "420", "520"],
+        CIGNAL: [
+          "120",
+          "200",
+          "220",
+          "320",
+          "470",
+          "520",
+          "620",
+          "820",
+          "1020",
+        ],
+        SATLITE: ["49", "99", "149", "199", "299"],
+      };
+
+      // 1. INLINE PIPELINE TEMPLATE INCLUSION LIFECYCLE
+      document.addEventListener("DOMContentLoaded", () => {
+        const fetchLogin = fetch("login.html").then((res) => res.text());
+        const fetchModal = fetch("modal.html").then((res) => res.text());
+
+        Promise.all([fetchLogin, fetchModal])
+          .then(([loginHtml, modalHtml]) => {
+            document.getElementById("loginContainer").innerHTML = loginHtml;
+            document.getElementById("modalContainer").innerHTML = modalHtml;
+            initializeSystemControls();
+          })
+          .catch((err) =>
+            console.error("Error loading separated templates:", err),
+          );
+      });
+
+      // 2. ATTACH ROUTINES TO SYSTEM MODULES
+      function initializeSystemControls() {
+        loginScreen = document.getElementById("loginScreen");
+        loginForm = document.getElementById("loginForm");
+        formModal = document.getElementById("formModal");
+        recordForm = document.getElementById("recordForm");
+        boxTypeDropdown = document.getElementById("box_type");
+        packageDropdown = document.getElementById("package");
+
+        if (sessionStorage.getItem("db_authenticated") === "true") {
+          grantAccess(false);
+        }
+
+        loginForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const user = document.getElementById("loginUser").value.trim();
+          const pass = document.getElementById("loginPass").value;
+
+          if (user === AUTH_USER && pass === AUTH_PASS) {
+            sessionStorage.setItem("db_authenticated", "true");
+            grantAccess(true);
+          } else {
+            Swal.fire({
+              title: "Access Denied",
+              text: "Invalid user credentials.",
+              icon: "error",
+              confirmButtonColor: "#2563eb",
+            });
+          }
+        });
+
+        document
+          .getElementById("logoutBtn")
+          .addEventListener("click", function () {
+            sessionStorage.removeItem("db_authenticated");
+            location.reload();
+          });
+
+        boxTypeDropdown.addEventListener("change", function () {
+          populatePackages(this.value);
+        });
+
+        document
+          .getElementById("openModalBtn")
+          .addEventListener("click", () => {
+            currentEditRecordId = null;
+            formModal.querySelector("h3").textContent = "Add Record Entry";
+            recordForm.reset();
+            document.getElementById("record_date").value = "2026-07-29";
+            packageDropdown.innerHTML =
+              '<option value="" disabled selected hidden>Select box type first...</option>';
+            packageDropdown.disabled = true;
+            formModal.classList.add("active");
+          });
+
+        function hideModal() {
+          formModal.classList.remove("active");
+          recordForm.reset();
+          currentEditRecordId = null;
+        }
+
+        const closeModalIcon = document.getElementById("closeModalIcon");
+        const closeModalBtn = document.getElementById("closeModalBtn");
+
+        closeModalIcon.addEventListener("click", hideModal);
+        closeModalBtn.addEventListener("click", hideModal);
+        formModal.addEventListener("click", (e) => {
+          if (e.target === formModal) hideModal();
+        });
+
+        recordForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const recordData = {
+            owner: document.getElementById("owner").value.trim(),
+            box_number: document.getElementById("box_number").value.trim(),
+            pin: parseInt(document.getElementById("pin").value) || 0,
+            package: packageDropdown.value,
+            box_type: boxTypeDropdown.value,
+            record_date: document.getElementById("record_date").value,
+            note: document.getElementById("note").value.trim(),
+          };
+
+          if (currentEditRecordId !== null) {
+            const recordIndex = db.findIndex(
+              (r) => r.record_id === currentEditRecordId,
+            );
+            if (recordIndex > -1) {
+              db[recordIndex] = {
+                record_id: currentEditRecordId,
+                ...recordData,
+              };
+              Swal.fire({
+                title: "Updated!",
+                text: "Record changed successfully.",
+                icon: "success",
+                confirmButtonColor: "#2563eb",
+              });
+            }
+          } else {
+            const nextId =
+              db.length > 0 ? Math.max(...db.map((r) => r.record_id)) + 1 : 1;
+            db.push({ record_id: nextId, ...recordData });
+            Swal.fire({
+              title: "Saved!",
+              text: "New entry added successfully.",
+              icon: "success",
+              confirmButtonColor: "#2563eb",
+            });
+          }
+
+          localStorage.setItem("load_records", JSON.stringify(db));
+          hideModal();
+          renderTable();
+        });
+      }
+
+      function grantAccess(animate) {
+        if (animate) {
+          loginScreen.style.opacity = "0";
+          setTimeout(() => {
+            loginScreen.style.display = "none";
+            dashboardContainer.style.display = "block";
+            renderTable();
+          }, 300);
+        } else {
+          loginScreen.style.display = "none";
+          dashboardContainer.style.display = "block";
+          renderTable();
+        }
+      }
+
+      function populatePackages(selectedBrand, currentVal = null) {
+        packageDropdown.innerHTML = "";
+        packageDropdown.disabled = false;
+        if (packageMatrix[selectedBrand]) {
+          packageMatrix[selectedBrand].forEach((price) => {
+            const optionEl = document.createElement("option");
+            optionEl.value = price;
+            optionEl.textContent = price;
+            if (currentVal && price === currentVal) optionEl.selected = true;
+            packageDropdown.appendChild(optionEl);
+          });
+        }
+      }
+
+      function editRecord(recordId) {
+        const record = db.find((r) => r.record_id === recordId);
+        if (!record || !formModal) return;
+
+        currentEditRecordId = recordId;
+        formModal.querySelector("h3").textContent =
+          `Edit Record Entry (#${recordId})`;
+
+        document.getElementById("owner").value = record.owner;
+        document.getElementById("box_number").value = record.box_number;
+        document.getElementById("pin").value = record.pin;
+        document.getElementById("record_date").value = record.record_date;
+        document.getElementById("note").value = record.note;
+        boxTypeDropdown.value = record.box_type;
+
+        populatePackages(record.box_type, record.package);
+        formModal.classList.add("active");
+      }
+
+      function renderTable() {
+        if (sessionStorage.getItem("db_authenticated") !== "true") return;
+        tableBody.innerHTML = "";
+
+        db.sort((a, b) => {
+          const dateA = new Date(a.record_date);
+          const dateB = new Date(b.record_date);
+          if (dateB - dateA !== 0) return dateB - dateA;
+          return b.record_id - a.record_id;
+        });
+
+        const searchQuery = searchInput.value.toLowerCase().trim();
+        const selectedBoxType = boxTypeFilter.value.toUpperCase().trim();
+
+        filteredRecords = db.filter((record) => {
+          const recordOwner = (record.owner || "").toLowerCase();
+          const recordBoxNumber = (record.box_number || "").toLowerCase();
+          const recordBoxType = (record.box_type || "").toUpperCase().trim();
+          const recordPackage = (record.package || "").toLowerCase();
+          const recordNote = (record.note || "").toLowerCase();
+
+          const matchesSearch =
+            recordOwner.includes(searchQuery) ||
+            recordBoxNumber.includes(searchQuery) ||
+            recordBoxType.toLowerCase().includes(searchQuery) ||
+            recordPackage.includes(searchQuery) ||
+            recordNote.includes(searchQuery);
+
+          const matchesBoxType =
+            selectedBoxType === "ALL" || recordBoxType === selectedBoxType;
+          return matchesSearch && matchesBoxType;
+        });
+
+        const totalItems = filteredRecords.length;
+        const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
+
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const startIdx = (currentPage - 1) * rowsPerPage;
+        const endIdx = Math.min(startIdx + rowsPerPage, totalItems);
+        const pageData = filteredRecords.slice(startIdx, endIdx);
+
+        if (pageData.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#475569; font-weight:600; padding: 40px;">No records match your filters.</td></tr>`;
+          updatePaginationControls(totalPages, 0, 0, 0);
+          return;
+        }
+
+        pageData.forEach((record) => {
+          const globalIndex = db.findIndex(
+            (r) => r.record_id === record.record_id,
+          );
+          const row = document.createElement("tr");
+
+          const normalizedType = (record.box_type || "").toUpperCase().trim();
+          if (normalizedType === "GSAT HD" || normalizedType === "GSAT PNOY") {
+            row.className = "box-gsat";
+          } else if (normalizedType === "SATLITE") {
+            row.className = "box-satlite";
+          } else if (normalizedType === "CIGNAL") {
+            row.className = "box-cignal";
+          }
+
+          row.innerHTML = `
+                <td><small style="color:#64748b; font-weight: 600;">#${record.record_id}</small></td>
+                <td><strong>${escapeHTML(record.owner)}</strong></td>
+                <td><code>${escapeHTML(record.box_number)}</code></td>
+                <td>${record.pin}</td>
+                <td><span class="badge-package">${escapeHTML(record.package)}</span></td>
+                <td><span class="box-type-text">${escapeHTML(record.box_type)}</span></td>
+                <td>${formatDateToLongStyle(record.record_date)}</td>
+                <td><i style="color:#64748b; font-size:0.9rem;">${escapeHTML(record.note || "—")}</i></td>
+                <td>
+                    <div class="btn-action-group">
+                        <button class="btn-edit" onclick="editRecord(${record.record_id})"><i class="fa-solid fa-pen-to-square"></i>Edit</button>
+                        <button class="btn-delete" onclick="deleteRecord(${globalIndex})"><i class="fa-solid fa-trash-can"></i>Delete</button>
+                    </div>
+                </td>
+            `;
+          tableBody.appendChild(row);
+        });
+
+        updatePaginationControls(totalPages, startIdx + 1, endIdx, totalItems);
+      }
+
+      function formatDateToLongStyle(dateString) {
+        if (!dateString) return "—";
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return dateString;
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        return date.toLocaleDateString("en-US", options);
+      }
+
+      function updatePaginationControls(totalPages, start, end, total) {
+        paginationInfo.innerHTML = `<i class="fa-solid fa-chart-simple" style="margin-right: 8px; color: var(--text-muted);"></i>Showing ${start} to ${end} of ${total} entries`;
+        paginationButtons.innerHTML = "";
+
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "btn-page";
+        prevBtn.innerHTML = `<i class="fa-solid fa-angle-left"></i>Prev`;
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => {
+          currentPage--;
+          renderTable();
+        };
+        paginationButtons.appendChild(prevBtn);
+
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+        if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+        for (let i = startPage; i <= endPage; i++) {
+          const pageBtn = document.createElement("button");
+          pageBtn.className = `btn-page ${i === currentPage ? "active" : ""}`;
+          pageBtn.textContent = i;
+          pageBtn.onclick = () => {
+            currentPage = i;
+            renderTable();
+          };
+          paginationButtons.appendChild(pageBtn);
+        }
+
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "btn-page";
+        nextBtn.innerHTML = `Next<i class="fa-solid fa-angle-right"></i>`;
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => {
+          currentPage++;
+          renderTable();
+        };
+        paginationButtons.appendChild(nextBtn);
+      }
+
+      searchInput.addEventListener("input", () => {
+        currentPage = 1;
+        renderTable();
+      });
+      boxTypeFilter.addEventListener("change", () => {
+        currentPage = 1;
+        renderTable();
+      });
+      rowsPerPageSelect.addEventListener("change", (e) => {
+        rowsPerPage = parseInt(e.target.value);
+        currentPage = 1;
+        renderTable();
+      });
+
+      function deleteRecord(globalIndex) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "This record will be permanently deleted.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#2563eb",
+          cancelButtonColor: "#64748b",
+          confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            db.splice(globalIndex, 1);
+            localStorage.setItem("load_records", JSON.stringify(db));
+            renderTable();
+            Swal.fire({
+              title: "Deleted!",
+              text: "The record has been removed.",
+              icon: "success",
+              confirmButtonColor: "#2563eb",
+            });
+          }
+        });
+      }
+
+      function escapeHTML(str) {
+        return str.replace(
+          /[&<>'"]/g,
+          (tag) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              "'": "&#39;",
+              '"': "&quot;",
+            })[tag] || tag,
+        );
+      }
+    </script>
+  </body>
+</html>
