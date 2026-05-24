@@ -1,3 +1,4 @@
+index.html
 <!doctype html>
 <html lang="en">
   <head>
@@ -58,7 +59,9 @@
         display: none;
       }
 
-      /* LOGIN PORTAL INJECTED LAYOUT UI STYLING */
+      /* ==========================================================================
+         FIXED MASTER LOGIN PORTAL LAYOUT UI STYLING
+         ========================================================================== */
       .login-screen {
         position: fixed;
         top: 0;
@@ -72,10 +75,11 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 2000;
+        z-index: 900;
         transition:
           opacity 0.3s ease,
           transform 0.3s ease;
+        pointer-events: auto;
       }
 
       .login-card {
@@ -123,20 +127,28 @@
         color: var(--text-muted);
         display: block;
       }
+
       .input-icon-wrapper {
         position: relative;
+        width: 100%;
       }
-      .input-icon-wrapper i {
+
+      /* Fixed decoration alignment elements */
+      .input-icon-wrapper i:not(.toggle-password-btn) {
         position: absolute;
         left: 14px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--text-muted);
+        z-index: 10;
+        pointer-events: none;
+        width: 16px;
+        text-align: center;
       }
 
       .login-input {
         width: 100%;
-        padding: 12px 14px 12px 40px;
+        padding: 12px 42px 12px 42px !important; /* Preserves clear spacing for side icons */
         background-color: var(--bg-input);
         border: 1px solid var(--border-color);
         border-radius: 8px;
@@ -145,11 +157,33 @@
         box-sizing: border-box;
         transition: all 0.2s ease;
       }
-
       .login-input:focus {
         background-color: #ffffff;
         border-color: var(--color-blue-main);
         box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+      }
+
+      /* Fixed right-side orientation parameters for your eye toggle button */
+      .toggle-password-btn {
+        position: absolute;
+        right: 14px;
+        left: auto !important;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        cursor: pointer;
+        z-index: 20;
+        padding: 4px;
+        pointer-events: auto !important;
+        transition: color 0.15s ease;
+        width: 16px;
+        text-align: center;
+      }
+      .toggle-password-btn:hover {
+        color: var(--color-blue-main);
+      }
+      .login-input#loginPass {
+        padding-right: 42px !important; /* Leave a safety padding clearance area on the right edge */
       }
 
       .btn-login {
@@ -166,13 +200,14 @@
         margin-top: 10px;
         box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
       }
-
       .btn-login:hover {
         background-color: var(--color-blue-hover);
         box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
       }
 
-      /* HEADER DASHBOARD STYLES */
+      /* ==========================================================================
+         HEADER DASHBOARD STYLES
+         ========================================================================== */
       .dashboard-header {
         display: flex;
         justify-content: space-between;
@@ -210,7 +245,6 @@
         font-size: 0.9rem;
         transition: all 0.2s;
       }
-
       .btn-logout:hover {
         background-color: #fee2e2;
         color: #ff3737;
@@ -307,7 +341,6 @@
         margin-bottom: 24px;
         border: 1px solid #e2e8f0;
         width: 100%;
-        height: 65vh;
       }
       table {
         width: 100%;
@@ -500,6 +533,11 @@
         transition: opacity 0.2s ease;
         z-index: 1000;
       }
+
+      /* Ensure SweetAlert appears above login screen */
+      .swal2-container {
+        z-index: 2000 !important;
+      }
       .modal-overlay.active {
         opacity: 1;
         pointer-events: auto;
@@ -615,6 +653,8 @@
         color: var(--text-main);
       }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
   <body>
     <div id="loginContainer"></div>
@@ -763,18 +803,20 @@
       </div>
     </div>
 
-    <script src="js/database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-      // CONFIGURATION: Access Credentials
-      const AUTH_USER = "admin";
-      const AUTH_PASS = "admin123";
+      const SUPABASE_URL = "https://zbggjpqbxefbyrbpcubx.supabase.co";
+      const SUPABASE_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpiZ2dqcHFieGVmYnlyYnBjdWJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MTE1MjQsImV4cCI6MjA5NTE4NzUyNH0.FBJd_zZbsDxIg6zZpME9MY-KuqmkbXpmndkiyCqBzMI";
 
-      let db = JSON.parse(localStorage.getItem("load_records")) || SEED_DATA;
+      console.log("LOG: Initializing Supabase client with URL:", SUPABASE_URL);
+      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      let db = [];
       let currentPage = 1;
       let rowsPerPage = 25;
-      let filteredRecords = [...db];
+      let filteredRecords = [];
 
       const tableBody = document.getElementById("tableBody");
       const searchInput = document.getElementById("searchInput");
@@ -808,24 +850,40 @@
         SATLITE: ["49", "99", "149", "199", "299"],
       };
 
-      // 1. INLINE PIPELINE TEMPLATE INCLUSION LIFECYCLE
+      async function generateSHA256(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+      }
+
+      function getLocalDateISOString() {
+        const today = new Date();
+        const offset = today.getTimezoneOffset();
+        const localizedDate = new Date(today.getTime() - offset * 60 * 1000);
+        return localizedDate.toISOString().split("T")[0];
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
+        console.log("LOG: DOM Content Loaded. Fetching components...");
         const fetchLogin = fetch("login.html").then((res) => res.text());
         const fetchModal = fetch("modal.html").then((res) => res.text());
 
         Promise.all([fetchLogin, fetchModal])
           .then(([loginHtml, modalHtml]) => {
+            console.log("LOG: Component files downloaded successfully.");
             document.getElementById("loginContainer").innerHTML = loginHtml;
             document.getElementById("modalContainer").innerHTML = modalHtml;
+
             initializeSystemControls();
           })
           .catch((err) =>
-            console.error("Error loading separated templates:", err),
+            console.error("CRITICAL LOG: Error loading templates:", err),
           );
       });
 
-      // 2. ATTACH ROUTINES TO SYSTEM MODULES
       function initializeSystemControls() {
+        console.log("LOG: Initializing elements and event hooks...");
         loginScreen = document.getElementById("loginScreen");
         loginForm = document.getElementById("loginForm");
         formModal = document.getElementById("formModal");
@@ -833,31 +891,146 @@
         boxTypeDropdown = document.getElementById("box_type");
         packageDropdown = document.getElementById("package");
 
+        // --- ASYNC PASSWORD VISIBILITY ICON WIRE EVENT ROUTINE ---
+        const passwordInput = document.getElementById("loginPass");
+        const toggleIcon = document.getElementById("togglePasswordBtn");
+
+        if (passwordInput && toggleIcon) {
+          toggleIcon.addEventListener("click", () => {
+            if (passwordInput.type === "password") {
+              passwordInput.type = "text";
+              toggleIcon.className =
+                "fa-solid fa-eye-slash toggle-password-btn";
+            } else {
+              passwordInput.type = "password";
+              toggleIcon.className = "fa-solid fa-eye toggle-password-btn";
+            }
+          });
+          console.log("LOG: Password hide/show event listener bound smoothly.");
+        }
+
         if (sessionStorage.getItem("db_authenticated") === "true") {
+          console.log(
+            "LOG: Found active auth token session. Bypassing login card.",
+          );
           grantAccess(false);
         }
 
-        loginForm.addEventListener("submit", function (e) {
-          e.preventDefault();
-          const user = document.getElementById("loginUser").value.trim();
-          const pass = document.getElementById("loginPass").value;
+        // --- ASYNC CLOUD AUTHENTICATION ROUTINE WITH STABLE MODAL WRAPPERS ---
+        if (loginForm) {
+          loginForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
 
-          if (user === AUTH_USER && pass === AUTH_PASS) {
-            sessionStorage.setItem("db_authenticated", "true");
-            grantAccess(true);
-          } else {
-            Swal.fire({
-              title: "Access Denied",
-              text: "Invalid user credentials.",
-              icon: "error",
-              confirmButtonColor: "#2563eb",
-            });
-          }
-        });
+            console.log(
+              "LOG: Login form submitted. Triggering loader spinner...",
+            );
+
+            try {
+              Swal.fire({
+                title: "Checking credentials...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                  Swal.showLoading();
+                },
+              });
+            } catch (swalErr) {
+              console.error("LOG: SweetAlert error:", swalErr);
+            }
+
+            const user = document.getElementById("loginUser").value.trim();
+            const pass = document.getElementById("loginPass").value;
+
+            try {
+              const encryptedPassword = await generateSHA256(pass);
+              console.log("LOG: Local SHA-256 signature calculated safely.");
+
+              console.log("LOG: Executing query match on 'users' table...");
+              const { data, error } = await _supabase
+                .from("users")
+                .select("username")
+                .eq("username", user)
+                .eq("password_hash", encryptedPassword)
+                .maybeSingle();
+
+              if (error) {
+                console.error(
+                  "LOG: Supabase returned a transaction error status:",
+                  error,
+                );
+                throw error;
+              }
+
+              console.log(
+                "LOG: Closing background loading animation overlay grid...",
+              );
+              Swal.close();
+
+              if (data) {
+                console.log(
+                  "LOG: Cloud authentication handshake verify match found.",
+                );
+                sessionStorage.setItem("db_authenticated", "true");
+                grantAccess(true);
+              } else {
+                console.warn(
+                  "LOG: Credential pairing match rejected by database pipeline engine.",
+                );
+
+                // Microtask padding guarantees loader frame cleanly fully unmounts before rendering the mismatch modal
+                setTimeout(() => {
+                  console.log(
+                    "LOG: Triggering 'Login Failed' alert popup modal window...",
+                  );
+                  try {
+                    Swal.fire({
+                      title: "Login Failed",
+                      text: "Incorrect credentials. Please check your username and password.",
+                      icon: "warning",
+                      confirmButtonColor: "#2563eb",
+                    });
+                  } catch (swalErr) {
+                    console.error("LOG: SweetAlert error on fail:", swalErr);
+                    alert("Login Failed: Incorrect credentials.");
+                  }
+                }, 300);
+              }
+            } catch (err) {
+              console.error(
+                "LOG: Authentication critical query breakdown catch-block catch:",
+                err,
+              );
+
+              try {
+                Swal.close();
+              } catch (e) {
+                console.error("LOG: Error closing SweetAlert:", e);
+              }
+
+              setTimeout(() => {
+                try {
+                  Swal.fire({
+                    title: "Connection Error",
+                    text:
+                      err.message ||
+                      "Unable to reach the security authentication server.",
+                    icon: "error",
+                    confirmButtonColor: "#2563eb",
+                  });
+                } catch (swalErr) {
+                  console.error("LOG: SweetAlert error on exception:", swalErr);
+                  alert("Error: " + (err.message || "Connection failed"));
+                }
+              }, 300);
+            }
+          });
+        } else {
+          console.error("LOG: loginForm element not found!");
+        }
 
         document
           .getElementById("logoutBtn")
           .addEventListener("click", function () {
+            console.log("LOG: Logging out. Wiping session.");
             sessionStorage.removeItem("db_authenticated");
             location.reload();
           });
@@ -872,7 +1045,8 @@
             currentEditRecordId = null;
             formModal.querySelector("h3").textContent = "Add Record Entry";
             recordForm.reset();
-            document.getElementById("record_date").value = "2026-07-29";
+            document.getElementById("record_date").value =
+              getLocalDateISOString();
             packageDropdown.innerHTML =
               '<option value="" disabled selected hidden>Select box type first...</option>';
             packageDropdown.disabled = true;
@@ -894,8 +1068,17 @@
           if (e.target === formModal) hideModal();
         });
 
-        recordForm.addEventListener("submit", function (e) {
+        recordForm.addEventListener("submit", async function (e) {
           e.preventDefault();
+
+          Swal.fire({
+            title: "Processing Request...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
           const recordData = {
             owner: document.getElementById("owner").value.trim(),
             box_number: document.getElementById("box_number").value.trim(),
@@ -906,52 +1089,90 @@
             note: document.getElementById("note").value.trim(),
           };
 
-          if (currentEditRecordId !== null) {
-            const recordIndex = db.findIndex(
-              (r) => r.record_id === currentEditRecordId,
-            );
-            if (recordIndex > -1) {
-              db[recordIndex] = {
-                record_id: currentEditRecordId,
-                ...recordData,
-              };
+          try {
+            if (currentEditRecordId !== null) {
+              const { error } = await _supabase
+                .from("load_records")
+                .update(recordData)
+                .eq("id", currentEditRecordId);
+
+              if (error) throw error;
+
               Swal.fire({
                 title: "Updated!",
                 text: "Record changed successfully.",
                 icon: "success",
                 confirmButtonColor: "#2563eb",
               });
+            } else {
+              const { error } = await _supabase
+                .from("load_records")
+                .insert([recordData]);
+
+              if (error) throw error;
+
+              Swal.fire({
+                title: "Saved!",
+                text: "New entry added successfully.",
+                icon: "success",
+                confirmButtonColor: "#2563eb",
+              });
             }
-          } else {
-            const nextId =
-              db.length > 0 ? Math.max(...db.map((r) => r.record_id)) + 1 : 1;
-            db.push({ record_id: nextId, ...recordData });
+
+            hideModal();
+            await fetchCloudRecords();
+          } catch (error) {
+            console.error("LOG: Database action threw an error:", error);
             Swal.fire({
-              title: "Saved!",
-              text: "New entry added successfully.",
-              icon: "success",
+              title: "Error!",
+              text:
+                error.message ||
+                "An unexpected system fault occurred while saving data.",
+              icon: "error",
               confirmButtonColor: "#2563eb",
             });
           }
-
-          localStorage.setItem("load_records", JSON.stringify(db));
-          hideModal();
-          renderTable();
         });
       }
 
+      async function fetchCloudRecords() {
+        if (sessionStorage.getItem("db_authenticated") !== "true") return;
+
+        const { data, error } = await _supabase
+          .from("load_records")
+          .select("*")
+          .order("record_date", { ascending: false });
+
+        if (error) {
+          console.error("LOG: Supabase network select read error:", error);
+          Swal.fire({
+            title: "Database Error",
+            text: error.message,
+            icon: "error",
+          });
+          return;
+        }
+
+        db = data.map((row) => ({
+          record_id: row.id,
+          ...row,
+        }));
+
+        renderTable();
+      }
+
       function grantAccess(animate) {
-        if (animate) {
-          loginScreen.style.opacity = "0";
-          setTimeout(() => {
-            loginScreen.style.display = "none";
-            dashboardContainer.style.display = "block";
-            renderTable();
-          }, 300);
-        } else {
+        const proceed = () => {
           loginScreen.style.display = "none";
           dashboardContainer.style.display = "block";
-          renderTable();
+          fetchCloudRecords();
+        };
+
+        if (animate) {
+          loginScreen.style.opacity = "0";
+          setTimeout(proceed, 300);
+        } else {
+          proceed();
         }
       }
 
@@ -989,7 +1210,6 @@
       }
 
       function renderTable() {
-        if (sessionStorage.getItem("db_authenticated") !== "true") return;
         tableBody.innerHTML = "";
 
         db.sort((a, b) => {
@@ -1038,9 +1258,6 @@
         }
 
         pageData.forEach((record) => {
-          const globalIndex = db.findIndex(
-            (r) => r.record_id === record.record_id,
-          );
           const row = document.createElement("tr");
 
           const normalizedType = (record.box_type || "").toUpperCase().trim();
@@ -1064,7 +1281,7 @@
                 <td>
                     <div class="btn-action-group">
                         <button class="btn-edit" onclick="editRecord(${record.record_id})"><i class="fa-solid fa-pen-to-square"></i>Edit</button>
-                        <button class="btn-delete" onclick="deleteRecord(${globalIndex})"><i class="fa-solid fa-trash-can"></i>Delete</button>
+                        <button class="btn-delete" onclick="deleteCloudRecord(${record.record_id})"><i class="fa-solid fa-trash-can"></i>Delete</button>
                     </div>
                 </td>
             `;
@@ -1081,6 +1298,58 @@
         const options = { year: "numeric", month: "long", day: "numeric" };
         return date.toLocaleDateString("en-US", options);
       }
+
+      async function deleteCloudRecord(recordId) {
+        const confirm = await Swal.fire({
+          title: "Delete Record?",
+          text: "This action cannot be undone.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#ff3737",
+          cancelButtonColor: "#6b7280",
+          confirmButtonText: "Delete",
+          cancelButtonText: "Cancel",
+        });
+
+        if (!confirm.isConfirmed) return;
+
+        Swal.fire({
+          title: "Deleting...",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        try {
+          const { error } = await _supabase
+            .from("load_records")
+            .delete()
+            .eq("id", recordId);
+
+          if (error) throw error;
+
+          Swal.fire({
+            title: "Deleted!",
+            text: "Record removed successfully.",
+            icon: "success",
+            confirmButtonColor: "#2563eb",
+          });
+
+          await fetchCloudRecords();
+        } catch (error) {
+          console.error("LOG: Delete operation failed:", error);
+          Swal.fire({
+            title: "Error!",
+            text: error.message || "Failed to delete record.",
+            icon: "error",
+            confirmButtonColor: "#2563eb",
+          });
+        }
+      }
+
+      window.editRecord = editRecord;
+      window.deleteCloudRecord = deleteCloudRecord;
 
       function updatePaginationControls(totalPages, start, end, total) {
         paginationInfo.innerHTML = `<i class="fa-solid fa-chart-simple" style="margin-right: 8px; color: var(--text-muted);"></i>Showing ${start} to ${end} of ${total} entries`;
@@ -1122,44 +1391,6 @@
         paginationButtons.appendChild(nextBtn);
       }
 
-      searchInput.addEventListener("input", () => {
-        currentPage = 1;
-        renderTable();
-      });
-      boxTypeFilter.addEventListener("change", () => {
-        currentPage = 1;
-        renderTable();
-      });
-      rowsPerPageSelect.addEventListener("change", (e) => {
-        rowsPerPage = parseInt(e.target.value);
-        currentPage = 1;
-        renderTable();
-      });
-
-      function deleteRecord(globalIndex) {
-        Swal.fire({
-          title: "Are you sure?",
-          text: "This record will be permanently deleted.",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#2563eb",
-          cancelButtonColor: "#64748b",
-          confirmButtonText: "Yes, delete it!",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            db.splice(globalIndex, 1);
-            localStorage.setItem("load_records", JSON.stringify(db));
-            renderTable();
-            Swal.fire({
-              title: "Deleted!",
-              text: "The record has been removed.",
-              icon: "success",
-              confirmButtonColor: "#2563eb",
-            });
-          }
-        });
-      }
-
       function escapeHTML(str) {
         return str.replace(
           /[&<>'"]/g,
@@ -1173,6 +1404,20 @@
             })[tag] || tag,
         );
       }
+
+      searchInput.addEventListener("input", () => {
+        currentPage = 1;
+        renderTable();
+      });
+      boxTypeFilter.addEventListener("change", () => {
+        currentPage = 1;
+        renderTable();
+      });
+      rowsPerPageSelect.addEventListener("change", (e) => {
+        rowsPerPage = parseInt(e.target.value);
+        currentPage = 1;
+        renderTable();
+      });
     </script>
   </body>
 </html>

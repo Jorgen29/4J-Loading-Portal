@@ -1,3 +1,4 @@
+login.html
 <style>
   /* Fixes the icon spacing and prevents text overlapping */
   .input-icon-wrapper {
@@ -5,7 +6,8 @@
     width: 100%;
   }
 
-  .input-icon-wrapper i {
+  /* Targets only the generic decoration icons on the left (User and Lock) */
+  .input-icon-wrapper i:not(.toggle-password-btn) {
     position: absolute;
     left: 14px;
     top: 50%;
@@ -19,7 +21,7 @@
 
   .login-input {
     width: 100%;
-    padding: 12px 14px 12px 42px !important;
+    padding: 12px 42px 12px 42px !important; /* Safety padding clearance on both left and right edges */
     background-color: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -27,6 +29,26 @@
     outline: none;
     box-sizing: border-box;
     transition: all 0.2s ease;
+  }
+
+  /* New distinct styles for the right-side eye icon button toggler */
+  .toggle-password-btn {
+    position: absolute;
+    right: 14px; /* Forces the eye icon to sit cleanly on the far right */
+    left: auto !important; /* Overrides any cascading left rules */
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    cursor: pointer;
+    z-index: 20;
+    pointer-events: auto !important; /* Enables mouse click events to register */
+    width: 16px;
+    text-align: center;
+    transition: color 0.15s ease;
+  }
+
+  .toggle-password-btn:hover {
+    color: var(--color-blue-main);
   }
 </style>
 
@@ -56,6 +78,10 @@
         <label for="loginPass">Password</label>
         <div class="input-icon-wrapper">
           <i class="fa-solid fa-lock"></i>
+          <i
+            class="fa-solid fa-eye toggle-password-btn"
+            id="togglePasswordBtn"
+          ></i>
           <input
             type="password"
             id="loginPass"
