@@ -1,0 +1,18 @@
+{
+  "name": "4J Loading Portal",
+  "short_name": "4J Portal",
+  "description": "Configuration and logistics portal for 4J.",
+  "start_url": "/4J-Loading-Portal/",
+  "display": "standalone",
+  "background_color": "#0a0f1d",
+  "theme_color": "#0a0f1d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://pwa-gen.s3.amazonaws.com/generic_icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
