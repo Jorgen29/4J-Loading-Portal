@@ -10,13 +10,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://pwa-gen.s3.amazonaws.com/generic_icon_512.png",
+      "src": "https://github.com/Jorgen29/4J-Loading-Portal/blob/production/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://pwa-gen.s3.amazonaws.com/generic_icon_512.png",
+      "src": "https://github.com/Jorgen29/4J-Loading-Portal/blob/production/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
