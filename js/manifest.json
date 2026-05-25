@@ -2,21 +2,21 @@
   "name": "4J Loading Portal",
   "short_name": "4J Portal",
   "description": "Configuration and logistics portal for 4J.",
-  "start_url": "/4J-Loading-Portal/index.html",
-  "scope": "/4J-Loading-Portal/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0a0f1d",
   "theme_color": "#0a0f1d",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://github.com/Jorgen29/4J-Loading-Portal/blob/production/logo.png",
+      "src": "https://jorgen29.github.io/4J-Loading-Portal/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://github.com/Jorgen29/4J-Loading-Portal/blob/production/logo.png",
+      "src": "https://jorgen29.github.io/4J-Loading-Portal/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
