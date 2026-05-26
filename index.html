@@ -8,6 +8,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <link rel="manifest" href="js/manifest.json">
     <link
       href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
       rel="stylesheet"
@@ -1415,6 +1416,14 @@
         currentPage = 1;
         renderTable();
       });
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        // Added 'js/' and the scope property so it can control the whole site
+        navigator.serviceWorker.register('js/sw.js', { scope: '/4J-Loading-Portal/' })
+          .then(() => console.log('Service Worker Registered Successfully'))
+          .catch((err) => console.log('Service Worker Failed:', err));
+      }
     </script>
   </body>
 </html>
